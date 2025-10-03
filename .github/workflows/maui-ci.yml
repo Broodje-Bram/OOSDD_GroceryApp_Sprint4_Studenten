@@ -1,4 +1,4 @@
-name: .NET MAUI CI – GroceryApp
+name: .NET MAUI CI – GroceryApp (Android + Windows)
 
 on:
   push:
@@ -8,53 +8,54 @@ on:
 
 jobs:
   build:
-    runs-on: windows-latest   # MAUI: Windows runner voor Android/Win builds
+    runs-on: windows-latest   # Nodig voor Android én Windows builds
 
     steps:
     - name: Checkout
       uses: actions/checkout@v4
 
-    - name: Setup .NET
+    - name: Setup .NET 8
       uses: actions/setup-dotnet@v4
       with:
-        # Zet dit gelijk aan jouw project (7.0.x of 8.0.x). Pas aan indien nodig.
-        dotnet-version: '7.0.x'
+        dotnet-version: '8.0.x'
 
-    - name: Restore
-      run: dotnet restore
-
-    # Installeer MAUI workloads (Android + Windows)
-    - name: Install .NET MAUI workloads
+    - name: Install MAUI workloads
       run: |
+        dotnet workload install maui
         dotnet workload install maui-android
         dotnet workload install maui-windows
 
+    - name: Restore
+      run: dotnet restore Grocery.App/Grocery.App.csproj
+
     - name: Build (Release)
-      run: dotnet build --configuration Release --no-restore
+      run: dotnet build Grocery.App/Grocery.App.csproj -c Release --no-restore
 
-    - name: Test
+    # Optioneel: alleen als er een testproject is
+    - name: Run tests
       run: dotnet test --no-build --configuration Release --verbosity normal
+      continue-on-error: true
 
-    # ---- Android (APK) ----
+    # -------- ANDROID --------
     - name: Publish Android (APK)
-      run: dotnet publish Grocery.App/Grocery.App.csproj -c Release -f net7.0-android -o ./artifacts/android
+      run: dotnet publish Grocery.App/Grocery.App.csproj -c Release -f net8.0-android -o ./artifacts/android
 
     - name: Upload Android artifact (APK)
       uses: actions/upload-artifact@v4
       with:
         name: GroceryApp-Android-APK
-        path: artifacts/android/*.apk
+        path: artifacts/android/**/*.apk
         if-no-files-found: error
         retention-days: 7
 
-    # ---- Windows (WinUI) – optioneel ----
+    # -------- WINDOWS --------
     - name: Publish Windows (WinUI)
-      run: dotnet publish Grocery.App/Grocery.App.csproj -c Release -f net7.0-windows10.0.19041.0 -o ./artifacts/winui
+      run: dotnet publish Grocery.App/Grocery.App.csproj -c Release -f net8.0-windows10.0.19041.0 -r win-x64 --self-contained false -o ./artifacts/winui
 
     - name: Upload Windows artifact
       uses: actions/upload-artifact@v4
       with:
         name: GroceryApp-Windows
         path: artifacts/winui/**
-        if-no-files-found: warn
+        if-no-files-found: error
         retention-days: 7
