@@ -28,10 +28,10 @@ jobs:
     - name: Restore
       run: dotnet restore Grocery.App/Grocery.App.csproj
 
-    - name: Build solution
-      run: dotnet build Grocery.App/Grocery.App.csproj -c Release --no-restore
-
     # -------- ANDROID --------
+    - name: Build Android
+      run: dotnet build Grocery.App/Grocery.App.csproj -c Release -f net8.0-android
+
     - name: Publish Android (APK)
       run: dotnet publish Grocery.App/Grocery.App.csproj -c Release -f net8.0-android -o ./artifacts/android
 
@@ -44,6 +44,9 @@ jobs:
         retention-days: 7
 
     # -------- WINDOWS --------
+    - name: Build Windows
+      run: dotnet build Grocery.App/Grocery.App.csproj -c Release -f net8.0-windows10.0.19041.0 -r win-x64
+
     - name: Publish Windows (WinUI)
       run: dotnet publish Grocery.App/Grocery.App.csproj -c Release -f net8.0-windows10.0.19041.0 -r win-x64 --self-contained false -o ./artifacts/winui
 
