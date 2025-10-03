@@ -1,0 +1,54 @@
+name: .NET MAUI CI Pipeline – GroceryApp
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: windows-latest   # Windows VM nodig voor MAUI builds
+
+    steps:
+    # Stap 1: Checkout code
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    # Stap 2: Setup .NET (check je projectfile of het 6.0 of 7.0 gebruikt)
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '7.0.x'
+
+    # Stap 3: Restore nuget dependencies
+    - name: Restore dependencies
+      run: dotnet restore
+
+    # Stap 4: Build de solution (Release mode)
+    - name: Build
+      run: dotnet build --configuration Release --no-restore
+
+    # Stap 5: Run tests (indien testproject aanwezig)
+    - name: Run tests
+      run: dotnet test --no-build --configuration Release --verbosity normal
+
+    # Stap 6: Publish MAUI voor Android (APK)
+    - name: Publish Android APK
+      run: dotnet publish Grocery.App/Grocery.App.csproj -f net7.0-android -c Release -o ./artifacts/android
+
+    - name: Upload APK Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: GroceryApp-Android-APK
+        path: ./artifacts/android/*.apk
+
+    # (Optioneel) Stap 7: Publish MAUI voor Windows
+    - name: Publish Windows App
+      run: dotnet publish Grocery.App/Grocery.App.csproj -f net7.0-windows10.0.19041.0 -c Release -o ./artifacts/winui
+
+    - name: Upload Windows Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: GroceryApp-Windows
+        path: ./artifacts/winui/**
