@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    runs-on: windows-latest   # Nodig voor Android én Windows builds
+    runs-on: windows-latest
 
     steps:
     - name: Checkout
@@ -28,13 +28,8 @@ jobs:
     - name: Restore
       run: dotnet restore Grocery.App/Grocery.App.csproj
 
-    - name: Build (Release)
+    - name: Build solution
       run: dotnet build Grocery.App/Grocery.App.csproj -c Release --no-restore
-
-    # Optioneel: alleen als er een testproject is
-    - name: Run tests
-      run: dotnet test --no-build --configuration Release --verbosity normal
-      continue-on-error: true
 
     # -------- ANDROID --------
     - name: Publish Android (APK)
