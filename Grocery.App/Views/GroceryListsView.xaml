@@ -6,39 +6,79 @@
              xmlns:m="clr-namespace:Grocery.Core.Models;assembly=Grocery.Core"
              x:DataType="vm:GroceryListViewModel"
              Title="GroceryListsView">
-    <Shell.TitleView>
-        <Grid>
-            <Label Text="Boodschappenlijsten" FontSize="Large" HorizontalOptions="Center" VerticalOptions="Center" />
-        </Grid>
-    </Shell.TitleView>
 
-    <Border Stroke="#C49B33"
-        StrokeThickness="4"
-        Padding="10"
-        Margin="10"
-        HorizontalOptions="Center">
-        <CollectionView x:Name="GroceryListView" ItemsSource="{Binding GroceryLists}" HorizontalOptions="Center"
-                        SelectionMode="Single"
-                        SelectionChangedCommand="{Binding SelectGroceryListCommand}"
-                        SelectionChangedCommandParameter="{Binding Source={RelativeSource Self}, Path=SelectedItem}">
-            <CollectionView.ItemsLayout>
-                <LinearItemsLayout Orientation="Vertical" ItemSpacing="10" />
-            </CollectionView.ItemsLayout>
+	<ContentPage.ToolbarItems>
+		<ToolbarItem Text="{Binding Client.Name}" Command="{Binding ShowBoughtProductsCommand}" />
+	</ContentPage.ToolbarItems>
 
-            <CollectionView.ItemTemplate>
-                <DataTemplate x:DataType="m:GroceryList">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="2*"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="15"/>
-                        </Grid.ColumnDefinitions>
-                        <Label Grid.Column="0" Text="{Binding Name}"/>
-                        <Label Grid.Column="1" Text="{Binding Date}" HorizontalOptions="End" Margin="0,0,10,0"/>
-                        <Rectangle Grid.Column="2" BackgroundColor="{Binding Color}" WidthRequest="15" HeightRequest="15" />
-                    </Grid>
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
-        </CollectionView>
-    </Border>
+	<Shell.TitleView>
+		<Grid>
+			<Label Text="Boodschappenlijsten" FontSize="Large" HorizontalOptions="Center" VerticalOptions="Center" />
+		</Grid>
+	</Shell.TitleView>
+
+	<Border Stroke="#C49B33"
+            StrokeThickness="4"
+            Padding="10"
+            Margin="10"
+            HorizontalOptions="Center">
+
+		<CollectionView ItemsSource="{Binding GroceryLists}"
+                        Margin="20"
+                        HorizontalOptions="Center"
+                        SelectionMode="None">
+			<CollectionView.ItemsLayout>
+				<LinearItemsLayout Orientation="Vertical" ItemSpacing="10" />
+			</CollectionView.ItemsLayout>
+
+			<CollectionView.Header>
+				<Grid Padding="8,0">
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="2*"/>
+						<ColumnDefinition Width="*"/>
+						<ColumnDefinition Width="24"/>
+					</Grid.ColumnDefinitions>
+					<Label Grid.Column="0" Text="Naam" FontAttributes="Bold"/>
+					<Label Grid.Column="1" Text="Datum" FontAttributes="Bold" HorizontalTextAlignment="End"/>
+					<Label Grid.Column="2" Text="Kleur" FontAttributes="Bold" HorizontalTextAlignment="Center"/>
+				</Grid>
+			</CollectionView.Header>
+
+			<CollectionView.ItemTemplate>
+				<DataTemplate x:DataType="m:GroceryList">
+					<Grid Padding="8,6">
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="2*"/>
+							<ColumnDefinition Width="*"/>
+							<ColumnDefinition Width="24"/>
+						</Grid.ColumnDefinitions>
+
+						<Label Grid.Column="0"
+                               Text="{Binding Name}"
+                               VerticalTextAlignment="Center"/>
+
+						<Label Grid.Column="1"
+                               Text="{Binding Date, StringFormat='{0:dd-MM-yyyy}'}"
+                               HorizontalTextAlignment="End"
+                               VerticalTextAlignment="Center"/>
+
+						<Border Grid.Column="2"
+                                WidthRequest="16"
+                                HeightRequest="16"
+                                HorizontalOptions="Center"
+                                VerticalOptions="Center">
+							<Border.Background>
+								<SolidColorBrush Color="{Binding Color}" />
+							</Border.Background>
+						</Border>
+
+						<Grid.GestureRecognizers>
+							<TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.ShowGroceryListItemsCommand}"
+                                                  CommandParameter="{Binding .}" />
+						</Grid.GestureRecognizers>
+					</Grid>
+				</DataTemplate>
+			</CollectionView.ItemTemplate>
+		</CollectionView>
+	</Border>
 </ContentPage>

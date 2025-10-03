@@ -30,15 +30,13 @@ namespace Grocery.Core.Data.Repositories
 
         public GroceryListItem Add(GroceryListItem item)
         {
-            int newId = groceryListItems.Max(g => g.Id) + 1;
-            item.Id = newId;
             groceryListItems.Add(item);
-            return Get(item.Id);
+            return item;
         }
 
         public GroceryListItem? Delete(GroceryListItem item)
         {
-            throw new NotImplementedException();
+            return null;
         }
 
         public GroceryListItem? Get(int id)
